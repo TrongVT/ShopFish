@@ -1,0 +1,104 @@
+﻿@model PagedList.IPagedList<Model.EF.User>
+
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+@section header{
+    Quản lý người dùng
+}
+<div class="panel panel-default panel-table">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col col-xs-6">
+                <h3 class="panel-title">Danh sách người dùng</h3>
+            </div>
+            <div class="col col-xs-6 text-right">
+                <a href="/Admin/User/Create/" class="btn btn-sm btn-primary">Thêm mới</a>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        @*Search user*@
+        <!-- Search Form -->
+        @using (Html.BeginForm("Index", "User", FormMethod.Get))
+                        {
+             <div class="col-md-6 col-md-offset-3">
+            <!-- Search Form -->
+
+                <!-- Search Field -->
+                <div class="row">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" type="text" name="searchString" placeholder="Search" value="@ViewBag.searchString"/>
+                            <span class="input-group-btn">
+                                <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"><span style="margin-left:10px;">Search</span></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- End of Search Form -->
+        </div>
+                        }
+        <div class="col-xs-12">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th><em class="fa fa-cog"></em></th>
+                            <th class="hidden-xs">Mã</th>
+                            <th>Họ tên</th>
+                            <th>Tài khoản</th>
+                            <th>Địa chỉ</th>
+                            <th>Email</th>
+                            <th>Số điện thoại</th>
+                            <th>Tình trạng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr id="row_@item.Id">
+                                <td align="center">
+                                    <a href="/Admin/User/Edit/@item.Id" class="btn btn-default">Sửa@*<em class="fa fa-pencil"></em>*@</a>
+                                    @Ajax.ActionLink("Xóa", "Delete", new { @id = @item.Id }, new AjaxOptions
+                           {
+                               Confirm = "Bạn có muốn xóa không?",
+                               OnComplete = "$('#row_" + @item.Id + "').remove()",
+                               HttpMethod = "Delete"
+                           }, new { @class = "btn btn-danger" })
+                                    @*<a href="/Admin/User/Delete/@item.Id" class="btn btn-danger"><em class="fa fa-trash"></em></a>*@
+                                </td>
+                                <td class="hidden-xs">@item.Id</td>
+                                <td>@item.Name</td>
+                                <td>@item.UserName</td>
+                                <td>@item.Address</td>
+                                <td>@item.Email</td>
+                                <td>@item.Phone</td>
+                                <td>
+                                    @if (@item.Status == true)
+                                    { <h5 class="text text-danger">Mở</h5>}
+                                    else
+                                    {<h5 class="text text-danger">Khóa</h5> }
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+            <div class="panel-footer">
+                <div class="row">
+                    @*<div class="col col-xs-4">
+                            Page 1 of 5
+                        </div>*@
+                    <div class="col col-xs-12 text-center">
+                        @Html.PagedListPager(Model, page => Url.Action("Index", new { page,@searchString=@ViewBag.searchString }))
+                    </div>
+                </div>
+            </div>
+        </div>
